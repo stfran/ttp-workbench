@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TTP-WorkBench compiled dataset record",
+  "description": "Common report or sentence record produced by Datasets/compile_data.py.",
+  "$comment": "This project-authored schema is licensed under CC BY-SA 4.0; see ../DATA_LICENSE.md.",
+  "type": "object",
+  "required": [
+    "text",
+    "sha1_hash",
+    "title",
+    "filepath",
+    "provenance",
+    "source",
+    "purpose",
+    "ground_truth",
+    "attack_version",
+    "modality"
+  ],
+  "properties": {
+    "text": {
+      "type": "string"
+    },
+    "sha1_hash": {
+      "type": "string"
+    },
+    "title": {
+      "type": ["string", "null"]
+    },
+    "filepath": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "provenance": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "ground_truth": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "attack_version": {
+      "type": "string"
+    },
+    "modality": {
+      "enum": ["report", "sentence"]
+    },
+    "reviewed": {
+      "type": "boolean"
+    },
+    "rejected": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}

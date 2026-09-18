@@ -1,0 +1,1 @@
+We reproduce the prompt-only procedure-to-tactic experiment in Table 2 of [8], using the released TTP-LLM repository directly and through the framework adapter. This is experiment 1 in our submitted paper's Table 6. The exercise compares both execution paths with the published per-tactic and samples-average F1 values.

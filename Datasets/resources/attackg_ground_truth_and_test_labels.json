@@ -1,0 +1,98 @@
+[
+    {
+        "file name":"Darpa_Firefox DNS Drakon APT.txt",
+        "title": "TC Firefox DNS Drakon APT",
+        "labels": ["T1003","T1005","T1059","T1105","T1566","T1204","T1041","T1218"],
+        "predictions": ["T1003","T1005","T1041","T1059","T1070","T1071","T1082","T1083","T1105","T1106","T1204","T1218","T1550","T1566","T1571","T1573"]
+    },
+    {
+        "file name":"Darpa_Firefox Drakon APT Elevate Copykatz.txt",
+        "title": "TC Firefox Drakon Copykatz",
+        "labels": ["T1189","T1082","TA0011"],
+        "predictions": ["T1059","T1071","T1566","T1573"]
+    },
+    {
+        "file name":"Darpa_Firefox BITS Micro APT.txt",
+        "title": "TC Firefox BITS Micro APT",
+        "labels": ["T1189","T1105","T1218","T1566","TA0011"],
+        "predictions": ["T1041","T1053","T1059","T1071","T1082","T1105","T1218","T1566","T1573"]
+    },
+    {
+        "file name":"Darpa_SSH BinFmt-Elevate.txt",
+        "title": "TC SSH BinFmt-Elevate",
+        "labels": ["T1003","T1005","T1218","TA0011"],
+        "predictions": ["T1003","T1005","T1053","T1059","T1070","T1071","T1082","T1105","T1218"]
+    },
+    {
+        "file name":"Darpa_Nginx Drakon APT.txt",
+        "title": "TC Nginx Drakon APT",
+        "labels": ["T1003","T1005","T1599","T1059","T1068","T1105","TA0011"],
+        "predictions": ["T1003","T1005","T1041","T1059","T1068","T1070","T1071","T1082","T1083","T1105","T1203","T1204","T1218","T1550","T1566","T1571","T1573"]
+    },
+    {
+        "file name":"Frankenstein Campaign.txt",
+        "title": "Frankenstein Campaign",
+        "labels": ["T1005","T1566","T1204","T1105","T1218","T1203","T1547","T1041","T1059"],
+        "predictions": ["T1005","T1041","T1059","T1068","T1070","T1071","T1105","T1203","T1218","T1566","T1571","T1573"]
+    },
+    {
+        "file name":"OceanLotus Campaign.txt",
+        "title": "OceanLotus(APT32) Campaign",
+        "labels": ["T1005","T1105","T1218","T1574"],
+        "predictions": ["T1005","T1059","T1105","T1218"]
+    },
+    {
+        "file name":"Cobalt Campaign.txt",
+        "title": "Cobalt Campaign",
+        "labels": ["T1566","T1105","T1203","T1204","T1218","T1059","TA0011"],
+        "predictions": ["T1059","T1070","T1071","T1105","T1203","T1204","T1218","T1566","T1571","T1573"]
+    },
+    {
+        "file name":"DeputyDog Campaign.txt",
+        "title": "DeputyDog Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"HawkEye Campaign.txt",
+        "title": "HawkEye Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"DustySky Campaign.txt",
+        "title": "DustySky Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"TrickLoad Spyware Campaign.txt",
+        "title": "TrickLoad Spyware Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"Emotet Campaign.txt",
+        "title": "Emotet Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"Uroburos Campaign.txt",
+        "title": "Uroburos Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"APT41 Campaign.txt",
+        "title": "APT41 Campaign",
+        "labels": [],
+        "predictions": []
+    },
+    {
+        "file name":"Espionage Campaign.txt",
+        "title": "Espionage Campaign",
+        "labels": [],
+        "predictions": []
+    }
+]

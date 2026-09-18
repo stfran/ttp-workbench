@@ -1,0 +1,7 @@
+This exercise maps to the submission's **E2 / C2** artifact-evaluation criteria: selected original-versus-framework fidelity, and independent checking of the reproduction analysis in experiment 3, Table 6. These are two different evaluation questions.
+
+| Evaluation question | Evidence and criterion | What it establishes |
+|---|---|---|
+| Did the selected execution paths work? | All four inference calls must record PASS status; each tool and execution path must supply all 34 expected grouped-document results. | Functionality for these LADDER and AttacKG integrations on this input. |
+| Did the framework preserve the available tools' document-level predictions? | Both tool variants are treated as deterministic. For each tool, require exact equality of the direct and framework technique-code sets for every group. The report's findings give the observed match count and list any differences. | C2 document-level prediction fidelity for each tool. Close aggregate scores alone are insufficient. |
+| Does the run support the published reproduction analysis? | Separately compare the original-tool F1 for the archived 25-, 118-label, and open scopes and their three-scope average with the paper values, retaining the published-50/archived-25 distinction. | Evidence consistent with experiment 3's `✓` outcome for LADDER and `✓ C` outcome for AttacKG. The original-tool averages reproduce the paper values at Table 6 precision; the AttacKG result is specific to Büchel's released variant. |

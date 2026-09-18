@@ -1,0 +1,45 @@
+[
+    {
+        "paper_ref": "FIN6 Not in paper",
+        "file_path": "FIN6/intelligence_summary.txt",
+        "ground_truth": ["T1078", "T1133", "T1566", " T1046", "T1069", "T1068", "T1018", "T1105", "T1553", "T1547", "T1053", "T1021", 
+            "T1059", "T1047", "T1003", "T1048", "T1005", "T1027", "T1560", "T1074", "T1190", "T1072", "T1080", "T1484"]
+    },
+    {
+        "paper_ref": "FIN6 [20]",
+        "file_path": "FIN6/Follow The Money-Dissecting the Operations of the Cyber Crime Group FIN6[1].txt",
+        "ground_truth": ["T1087", "T1560", "T1119", "T1547", "T1110", "T1059", "T1074", "T1573", "T1068", "T1070", 
+        "T1046", "T1003", "T1572", "T1021", "T1018", "T1053", "T1078", "T1003"]
+    },
+    {
+        "paper_ref": "FIN6 [25]",
+        "file_path": "FIN6/Pick-Six-Intercepting a FIN6 Intrusion, an Actor Recently Tied to Ryuk and LockerGoga Ransomware[2].txt",
+        "ground_truth": ["T1134", "T1059", "T1562", "T1036", "T1588", "T1003", "T1021", "T1569", "T1078", "T1102",
+        "T1087", "T1482", "T1069", "T1018", "T1016", "T1548", "T1071", "T1185", "T1059", 
+        "T1543", "T1132", "T1005", "T1001", "T1140", "T1573", "T1068", "T1083",
+        "T1564", "T1562", "T1070", "T1105", "T1056", "T1112", "T1046", "T1095", "T1027", "T1137", 
+        "T1003", "T1069", "T1057", "T1055", "T1572", "T1572", "T1090", "T1012", "T1620", "T1021",
+        "T1018", "T1029", "T1113", "T1518", "T1553", "T1218", "T1049", "T1007", "T1569", "T1550", 
+        "T1078", "T1047"]
+    },
+    {
+        "paper_ref": "MenuPass [51]",
+        "file_path": "MenuPass/2018_12_20_united_states_v_zhu_hua_indictment[2].txt",
+        "ground_truth": ["T1583", "T1560", "T1568", "T1070", "T1056", "T1036", "T1105", "T1566", "T1021", "T1199", "T1204", "T1078"]
+    },
+    {
+        "paper_ref": "MenuPass [47]",
+        "file_path": "MenuPass/Japan-Linked Organizations Targeted in Long-Running and Sophisticated Attack Campaign[8].txt",
+        "ground_truth": ["T1560", "T1119", "T1059", "T1005", "T1074", "T1210", "T1083", "T1574", "T1106", "T1027", "T1003", "T1199", "T1078", "T1047"]
+    },
+    {
+        "paper_ref": "WizardSpider [18]",
+        "file_path": "WizardSpider/Ransomware Activity Targeting the Healthcare and Public Health Sector. Retrieved October 28, 2020[2].txt",
+        "ground_truth": ["T1547", "T1059", "T1562", "T1135", "T1566", "T1055", "T1021", "T1053", "T1558", "T1204", "T1047"]
+    },
+    {
+        "paper_ref": "WizardSpider [48]",
+        "file_path": "WizardSpider/Ryuk’s Return[7].txt",
+        "ground_truth": ["T1087", "T1059", "T1048", "T1210", "T1562", "T1027", "T1021", "T1018", "T1489", "T1518", "T1558", "T1082", "T1569"]
+    }
+]

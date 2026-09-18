@@ -1,0 +1,1 @@
+We reproduce the technique-identification comparison in Table 9 of LADDER [6], using LADDER, AttacKG [2], and TTPDrill [1] on five reports. This is experiment 8 in our submitted paper's Table 6. We distinguish whether the framework preserves the available tools' predictions from whether those predictions reproduce the published comparison.

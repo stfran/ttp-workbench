@@ -1,0 +1,17 @@
+report,GT,TTPDrill_FN,TTPDrill_FP,AttacKG_FN,AttacKG_FP
+TC Firefox DNS Drakon APT,8,2,10,0,3
+TC Firefox Drakon Copykatz,4,1,13,1,0
+TC Firefox BITS Micro APT,5,1,14,2,2
+TC SSH BinFmt-Elevate,5,2,14,2,2
+TC Nginx Drakon APT,6,2,22,0,2
+Frankenstein Campaign,9,1,18,1,1
+OceanLotus(APT32) Campaign,5,1,12,2,0
+Cobalt Campaign,8,2,21,1,1
+DeputyDog Campaign,10,1,35,0,6
+HawkEye Campaign,11,2,64,1,3
+DustySky Campaign,5,0,32,0,1
+TrickLoad Spyware Campaign,4,0,18,2,0
+Emotet Campaign,7,2,16,3,0
+Uroburos Campaign,7,0,23,1,2
+APT41 Campaign,6,2,26,1,1
+Espionage Campaign,4,0,19,0,1

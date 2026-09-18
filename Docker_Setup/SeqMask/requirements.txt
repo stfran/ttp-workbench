@@ -1,0 +1,7 @@
+pandas
+bert4keras
+pdfminer.six
+simplejson
+
+tensorflow==2.15.*
+tqdm

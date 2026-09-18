@@ -1,0 +1,26 @@
+{
+    "text": "The intrusion began with the execution of a malicious macro within a Word document. The document was themed as a job application for the firm Lumen. This tactic has been observed by many threat actor groups, including state sponsored actors in North Korea and Iran. Upon opening the file, the user was prompted to enable macros to complete the form, which began execution of the malware.\nOnce executed, the macro created a VBS script (Updater.vbs), two PowerShell scripts (temp.ps1 and Script.ps1), and installed persistence through a scheduled task. The implant was fully implemented in PowerShell, which is uncommon compared to many initial access tools today.\nFollowing the execution of the VBA embedded macros, the PowerShell script, Script.ps1, began to connect to the C2 server through an encrypted channel. Around a day after execution, the server became live and began sending instructions to the implant. The instructions obtained from the server were then executed through the temp.ps1 PowerShell script.\nThe threat actors began executing basic discovery commands, all of which were executed via PowerShell cmdlets or built-in Windows utilities like whoami, net, time, tzutil and tracert; one exception to this was when the threat actors extracted a specific function from the PowerSploit framework, Convert-LDAPProperty, to enumerate domain accounts in the environment. All data collected was then exfiltrated over the existing C2 channel.\nOn the fourth day of the intrusion, the threat actors became active again by dropping of a set of files that performed keylogger functions. A scheduled task was then created to assist in execution of the keylogger. The keylogger itself was comprised of an executable, module.exe, which was a renamed AutoHotkey binary. This would run the AutoHotkey script module.ahk. Additionally, a PowerShell script called readKey.ps1 would execute in the same task.\nOn the sixth day of the intrusion, the threat actors returned and collected the data compiled by the keylogger. This was performed using the makecab.exe Windows utility to compress the keylogger files before exfiltrating them to the C2 server. They then dropped another PowerShell script. This script would take a screenshot of the desktop of the infected host. After this data was exfiltrated, the threat actors reviewed the antivirus service status and some additional host data.\nThe threat actors returned again on the seventh and ninth days to collect the keylogger data. The threat actors were not observed performing any further actions before being evicted from the environment.",
+    "sha1_hash": "a47f2b383f8ca21e48d280bb0b01eb5dd68623c2",
+    "title": "AHK keylogger",
+    "filepath": "../../ttp-workbench/Datasets/prior_work_data/RAF-AG/Dataset/CTI reports/AHK keylogger.txt",
+    "provenance": "RAF-AG",
+    "source": "manual",
+    "purpose": "testing",
+    "ground_truth": [
+        "T1056.001",
+        "T1113",
+        "TA0010",
+        "TA0009",
+        "TA0007",
+        "T1036.004",
+        "T1588.001",
+        "T1105",
+        "T1573",
+        "T1204.002",
+        "T1059",
+        "TA0003"
+    ],
+    "attack_version": "unk",
+    "modality": "report",
+    "duplicate": false
+}

@@ -1,0 +1,1 @@
+We reproduce the generative experiments in Table 9 of Buchel et al. [9], which tests different LLM prompt styles and LLM models on data from AnnoCTR [11] and TRAM, using both the released generation code directly and the framework's Buchel adapter. This is experiment 2 in our submitted paper's Table 6.
