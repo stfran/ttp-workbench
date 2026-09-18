@@ -193,9 +193,10 @@ python Framework/adapters/ttpdrill_adapter.py
 
 Project-authored software and documentation are released under the
 [Apache License 2.0](LICENSE). The common-record schema, author-created
-benchmark annotations, labels and structured metadata, and the authors'
-selection, normalization, and arrangement of compiled datasets are released
-under [CC BY-SA 4.0](DATA_LICENSE.md). Third-party software, models, datasets, MITRE
+benchmark annotations, labels and structured metadata, trained Orbinato
+reproduction checkpoints created by the authors, and the authors' selection,
+normalization, and arrangement of compiled datasets are released under
+[CC BY-SA 4.0](DATA_LICENSE.md). Third-party software, models, datasets, MITRE
 ATT&CK content, and cyber threat report text retain their own terms; see
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the per-tool documentation.
 
