@@ -1,0 +1,16 @@
+Orbinato upstream artifact license notice
+==========================================
+
+The CTI-to-MITRE with NLP replication package and its additional-files bundle
+are licensed under the Creative Commons Attribution-ShareAlike 4.0
+International Public License (CC BY-SA 4.0):
+
+https://creativecommons.org/licenses/by-sa/4.0/
+https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+Vittorio Orbinato, Mariarosaria Barbaraci, Roberto Natella, and Domenico
+Cotroneo, "Automatic Mapping of Unstructured Cyber Threat Intelligence: An
+Experimental Study (Practical Experience Report)," ISSRE 2022.
+
+Upstream repository:
+https://github.com/dessertlab/cti-to-mitre-with-nlp

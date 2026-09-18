@@ -14,9 +14,15 @@ COMPONENTS = {
     "buchel/sft_bosch.zip",
     "buchel/generation.zip",
     "buchel/ext_tools.zip",
+    "buchel/LLAMA_3.1_LICENSE.txt",
+    "buchel/NOTICE",
     "orbinato/models.zip",
     "orbinato/additional_files.zip",
+    "orbinato/LICENSE.txt",
+    "orbinato/SECBERT_LICENSE.txt",
+    "orbinato/MITRE_LICENSE.txt",
     "seqmask/models.zip",
+    "seqmask/LICENSE.txt",
     "benchmark/results.zip",
 }
 TRAM_PREFIX = PurePosixPath("buchel/sft_tram/merged")

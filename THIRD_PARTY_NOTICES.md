@@ -7,7 +7,8 @@ This file summarizes third-party tools and datasets used by TTP-WorkBench.
 Unless otherwise stated, the TTP-WorkBench framework code, adapters, wrapper scripts, Dockerfiles, evaluation scripts, and documentation written by the TTP-WorkBench authors are governed by the license in `LICENSE`.
 
 The common-record schema in `Datasets/schema.json`, benchmark annotations,
-labels and structured metadata created by the TTP-WorkBench authors, and the
+labels and structured metadata created by the TTP-WorkBench authors, the
+trained Orbinato reproduction checkpoints created by the authors, and the
 authors' selection, normalization, and arrangement of the compiled datasets
 are governed by `DATA_LICENSE.md`. That license does not apply to third-party
 report text or other content retained in compiled records, datasets, models,
@@ -16,6 +17,18 @@ or other material that the project authors do not have authority to relicense.
 TTP-WorkBench interacts with third-party code, data, models, and public cyber threat reports. Those third-party materials remain governed by their original licenses, terms of use, or copyright status. The inclusion of an adapter, Dockerfile, build script, or compatibility patch in this repository does not relicense any upstream component.
 
 For tools whose upstream licensing status does not clearly permit redistribution, we avoid distributing copied source trees or prebuilt container images. In those cases, the Dockerfile/build script documents how to reconstruct the environment locally from the upstream source. See Docker_Setup for details.
+
+## Model Notices
+
+The Büchel AnnoCTR and TRAM checkpoints are based on Llama 3.1 and remain
+subject to the Llama 3.1 Community License. The license agreement and required
+attribution notice are retained in `Docker_Setup/Buchel/` and in the released
+`models.zip`. Built with Llama.
+
+The Orbinato and SeqMask payloads retain their upstream license notices in
+their `Docker_Setup/` directories and in the released `models.zip`. The
+Orbinato SecBERT checkpoint also retains the upstream SecBERT notice, and the
+MITRE license accompanies the ATT&CK and CAPEC material in that payload.
 
 ## Data Notices
 

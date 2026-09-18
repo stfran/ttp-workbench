@@ -7,6 +7,8 @@
   `https://zenodo.org/records/16753555`
 - License: Creative Commons Attribution Share Alike 4.0 International
 - License URL: https://creativecommons.org/licenses/by-sa/4.0/
+- Model base: Llama 3.1 Community License; see `LLAMA_3.1_LICENSE.txt` and
+  `NOTICE`. Built with Llama.
 - TTP-WorkBench app image: `localhost/generation_app:latest`
 - TTP-WorkBench Ollama image: `localhost/generation_ollama:latest`
 
@@ -14,6 +16,7 @@ The top-level installer obtains one monolithic `models.zip` and stages its
 Büchel assets locally. Setup installs the supplied AnnoCTR checkpoint from the
 staged Bosch-only component archive. The Table 9 reproduction uses the
 published TRAM checkpoint embedded in the same `models.zip`.
+The monolithic archive retains the Llama 3.1 license and attribution notice.
 
 
 ## What this setup does

@@ -7,6 +7,8 @@
 - Commit: `a8cacf3185d098c686e0d88768a619a03a4d76d1`
 - License: Creative Commons Attribution Share Alike 4.0 International
 - License URL: https://creativecommons.org/licenses/by-sa/4.0/
+- Retained notices: `UPSTREAM_LICENSE.txt`, `SECBERT_LICENSE.txt`, and the
+  project MITRE notice in `Framework/utils/attack_stix/LICENSE.txt`
 - TTP-WorkBench image tag: `ttp-workbench:orbinato`
 
 ## What this container does
@@ -14,6 +16,7 @@
 The setup script downloads and verifies the data/word-vector bundle and models we trained during our reproduction experiments. The Dockerfile then builds an Orbinato runtime environment from experiment runner code, installs the original requirements plus current `torch`/`transformers`, adds the data/work-verctor and trained models, creates an import-safe document-analysis module, and copies in the CLI wrapper.
 
 The adapter can run several Orbinato model variants. If a requested model is missing, the adapter runs the corresponding training script inside the container and commits the trained artifacts back into the image for later reuse. This is not the default behavior because we include the trained models from our experiments, but others can delete them and stage new data to train new models.
+The included reproduction-trained checkpoints are scoped by `DATA_LICENSE.md`.
 
 
 ## Changes and adaptation steps

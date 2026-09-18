@@ -7,6 +7,7 @@
 - Commit: `f3686599065a58927562fbb5c4bf71c075a687ba`
 - License: MIT License, Copyright (c) 2021 Ge Wenhan
 - License URL: https://github.com/MuscleFish/SeqMask?tab=MIT-1-ov-file
+- Retained license: `UPSTREAM_LICENSE.txt`
 - TTP-WorkBench image tag: `ttp-workbench:seqmask`
 
 ## What this container does
