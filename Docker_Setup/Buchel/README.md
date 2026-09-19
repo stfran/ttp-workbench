@@ -18,6 +18,23 @@ staged Bosch-only component archive. The Table 9 reproduction uses the
 published TRAM checkpoint embedded in the same `models.zip`.
 The monolithic archive retains the Llama 3.1 license and attribution notice.
 
+### TRAM checkpoint representation
+
+The published TRAM checkpoint declares `torch_dtype: bfloat16`, but its 224
+LoRA-merged attention and MLP projection tensors are serialized as FP32; its
+other 67 tensors are BF16. Both the original and framework reproduction paths
+call the pinned Unsloth loader with `dtype=None`. On the supported evaluation
+GPUs, that loader selects BF16 and passes `torch_dtype=torch.bfloat16` when
+loading the checkpoint. The release archive therefore stores the published
+TRAM tensors in the BF16 representation used by both inference paths instead
+of retaining FP32 values that are discarded during loading.
+
+Normalization preserves every tensor name and shape. All 291 tensors in the
+normalized checkpoint were reopened and compared with the published tensors;
+each is exactly equal to the value produced by converting its published tensor
+to BF16. The normalized checkpoint saves ~13GB of model-weight
+storage.
+
 
 ## What this setup does
 The upstream artifact already produces a containerized generative experiment stack in `generation.zip`. `setup_buchel.sh` downloads and verifies both that bundle and `ext_tools.zip`, extracts them into `buchel_generation/`, adds the supplied merged checkpoints to the generation app image, copies in the adapter CLI, and builds the Compose images used by `BuchelAdapter`. The extracted `ext_tools/dataset/bosch_test.json` is subsequently used when compiling the reproduction inputs.
