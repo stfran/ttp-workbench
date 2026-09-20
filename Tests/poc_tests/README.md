@@ -26,6 +26,14 @@ Fidelity policies apply when `--backend both` compares the native and framework
 paths. The comparison normalizes each report to a set of unique ATT&CK tactic
 and technique identifiers.
 
+The native path runs the original tool outside a container by following its
+released execution instructions, with the fixes required to make it workable
+and without TTP-WorkBench input or output normalization. The harness extracts
+TTP predictions from the tool's original output. The framework path runs the
+same workable tool within TTP-WorkBench through its adapter, which normalizes
+the input and output. Both paths receive the same fixes needed to bring the
+tool to a workable state.
+
 - `strict`: `PASS` requires exact native/framework prediction-set agreement for
   every report.
 - `diagnostic`: prediction differences and Jaccard agreement are reported, but
@@ -36,10 +44,16 @@ and technique identifiers.
 
 Missing, duplicate, malformed, unexpected, or error-bearing results fail under
 every policy. Jaccard is reported as evidence and is not used as a pass
-threshold. With `--backend both`, an overall `PASS` means both paths passed
-functional validation and the applicable fidelity policy passed. Under
-`diagnostic`, `PASS` does not imply exact prediction agreement; consult the
-reported agreement, exact-report count, and Jaccard values.
+threshold. Fidelity does not compare predictions with ground truth; it checks
+whether integration into TTP-WorkBench affects the tool's predictions. Jaccard
+agreement measures this prediction-set fidelity for each report as
+`|native ∩ framework| / |native ∪ framework|`; 1.0000 means the framework
+did not change the tool's prediction performance on that input. With
+`--backend both`, an overall
+`PASS` means both paths passed functional validation and the applicable
+fidelity policy passed. Under `diagnostic`, `PASS` does not imply exact
+prediction agreement; consult the reported agreement, exact-report count, and
+Jaccard values.
 
 
 ## References

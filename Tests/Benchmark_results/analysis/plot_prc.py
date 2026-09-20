@@ -67,8 +67,8 @@ def plot_prc(
     csv_path,
     out_prefix,
     eval_mode="generous",
-    font_scale=1.8,
-    figsize=(7.6, 3.6),
+    font_scale=1.0,
+    figsize=(8.115, 3.725),
 ):
     df = pd.read_csv(csv_path)
 
@@ -83,7 +83,7 @@ def plot_prc(
     # Coverage colorbar uses support_macro_labels, not capacity.
     coverage_col = "support_macro_labels"
 
-    # Font sizes: scaled up relative to the small original figure.
+    # Font sizes match the paper reference figure.
     title_fs = 10 * font_scale
     axis_fs = 9 * font_scale
     tick_fs = 8 * font_scale
@@ -205,7 +205,7 @@ def plot_prc(
     fig.tight_layout()
 
     fig.savefig(f"{out_prefix}.pdf", bbox_inches="tight")
-    fig.savefig(f"{out_prefix}.png", dpi=300, bbox_inches="tight")
+    fig.savefig(f"{out_prefix}.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -226,8 +226,8 @@ def main():
     parser.add_argument(
         "--font-scale",
         type=float,
-        default=1.8,
-        help="Scale factor for plot text. Try 1.5, 1.8, or 2.0.",
+        default=1.0,
+        help="Scale factor for plot text (default: paper-reference scale).",
     )
     args = parser.parse_args()
     if "/" in args.out or "\\" in args.out:

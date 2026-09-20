@@ -6,8 +6,10 @@ Utilities based on STIX ATT&CK
 """
 from __future__ import annotations
 
+import hashlib
 import json, os, re, logging
 from pathlib import Path
+import time
 from typing import Dict, List, Any, Optional, Tuple, Set, Union
 import pprint
 import difflib
@@ -41,6 +43,17 @@ COLLECTIONS = {
 RAW_BASE = "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/master"
 ATTACK_INDEX_URL = f"{RAW_BASE}/index.json"
 HEADERS = {"User-Agent": "ATTACK-Utils/1.0"} 
+
+# The artifact and reproduction inputs use this immutable ATT&CK 19.2
+# snapshot. Versioned filenames prevent a later upstream release from changing
+# the bytes used by an evaluation run.
+PINNED_ATTACK_VERSION = "19.2"
+PINNED_ATTACK_COMMIT = "6cda5ad8462c79e14fbb872f4e09059b18e0cfc4"
+PINNED_ATTACK_SHA256 = {
+    "enterprise-attack": "dc1639caa5501d720e280cf1cbd8fbe009884a0c9b3e6e9ed9d0c25166c3d8f4",
+    "mobile-attack": "acfa5ca2d93484476f79bf38590e2b55bb675fc0ce85e76bffa0af2c82dada64",
+    "ics-attack": "08b83d2cea6b6d6752468ef0e62e2ab2a53c9443ef72c439ecccb07ab9e89da9",
+}
 
 # Technique path tokens in URLs: /techniques/T1547 or /techniques/T1547/001
 _PATH_RE = re.compile(r"/techniques/(T\d{4})(?:/(\d{3}))?", re.I)
@@ -220,10 +233,83 @@ def _download_domain_jsons(version_hint: Optional[str]) -> None:
     _write_json(META_PATH, {"attack_version": version_hint or "unknown"})
 
 
+def _has_expected_digest(path: Path, expected: str) -> bool:
+    if not path.is_file():
+        return False
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest() == expected
+
+
+def _download_pinned_domain_jsons(force_refresh: bool = False) -> None:
+    if requests is None:
+        missing = [
+            str(local_path)
+            for key, (_, local_path, _) in COLLECTIONS.items()
+            if not _has_expected_digest(local_path, PINNED_ATTACK_SHA256[key])
+        ]
+        if missing:
+            raise RuntimeError(
+                "Requests is unavailable and pinned ATT&CK data must be staged: "
+                + ", ".join(missing)
+            )
+        return
+
+    for key, (_, local_path, _) in COLLECTIONS.items():
+        expected = PINNED_ATTACK_SHA256[key]
+        if not force_refresh and _has_expected_digest(local_path, expected):
+            print(f"Using verified MITRE ATT&CK {PINNED_ATTACK_VERSION} snapshot: {local_path}")
+            continue
+
+        url = (
+            "https://raw.githubusercontent.com/mitre-attack/attack-stix-data/"
+            f"{PINNED_ATTACK_COMMIT}/{key}/{key}-{PINNED_ATTACK_VERSION}.json"
+        )
+        error: Optional[Exception] = None
+        for attempt in range(1, 6):
+            try:
+                print(
+                    f"Downloading MITRE ATT&CK {PINNED_ATTACK_VERSION} "
+                    f"{key} snapshot (attempt {attempt}/5)"
+                )
+                response = requests.get(url, timeout=(10, 300), headers=HEADERS)
+                response.raise_for_status()
+                payload = response.content
+                actual = hashlib.sha256(payload).hexdigest()
+                if actual != expected:
+                    raise RuntimeError(
+                        f"Checksum mismatch for {key}: expected {expected}, found {actual}"
+                    )
+                partial = local_path.with_name(local_path.name + ".part")
+                partial.write_bytes(payload)
+                os.replace(partial, local_path)
+                error = None
+                break
+            except Exception as exc:
+                error = exc
+                if attempt < 5:
+                    time.sleep(5)
+        if error is not None:
+            raise RuntimeError(f"Unable to stage pinned ATT&CK snapshot {key}") from error
+
+    _write_json(META_PATH, {"attack_version": PINNED_ATTACK_VERSION})
+
+
 def ensure_stix_data(force_refresh: bool = False) -> Optional[str]:
     """Ensure local STIX JSONs exist; refresh if remote version changed, unless config specifies a version we want to stick to.
     Returns the version string we believe we're aligned to (if known).
     """
+    if attack_version_config:
+        if attack_version_config != PINNED_ATTACK_VERSION:
+            raise RuntimeError(
+                "The configured ATT&CK version has no pinned artifact snapshot: "
+                f"{attack_version_config}"
+            )
+        _download_pinned_domain_jsons(force_refresh=force_refresh)
+        return PINNED_ATTACK_VERSION
+
     need_files = not (ENTERPRISE_ATTACK.exists() and MOBILE_ATTACK.exists() and ICS_ATTACK.exists())
     meta = _read_json(META_PATH, {})
     local_ver = str(meta.get("attack_version") or "").strip() or None
@@ -232,10 +318,6 @@ def ensure_stix_data(force_refresh: bool = False) -> Optional[str]:
     if force_refresh or need_files or (remote_ver and local_ver and remote_ver != local_ver):
         _download_domain_jsons(remote_ver or local_ver)
         local_ver = remote_ver or local_ver
-
-    # Override with config version if specified
-    if attack_version_config:
-        local_ver = attack_version_config
 
     return local_ver
 
@@ -1172,6 +1254,7 @@ Strict extraction (from markdown/URLs):
         epilog=EXAMPLES,
     )
     ap.add_argument("--refresh", action="store_true", help="Force refresh of STIX JSONs")
+    ap.add_argument("--ensure", action="store_true", help="Stage and verify the configured STIX snapshot")
     ap.add_argument("--check", metavar="CODE", help="Check presence and name for CODE")
     ap.add_argument("--loose", metavar="TEXT", help="Run loose extractor on TEXT")
     ap.add_argument("--strict", metavar="TEXT", help="Run strict extractor on TEXT (bold+URLs)")

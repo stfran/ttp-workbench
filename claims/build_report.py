@@ -56,24 +56,24 @@ def read_status(run: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle, delimiter="\t"))
 
 
-def smoke_details(row: dict[str, str], run: Path) -> tuple[str, str, str, str]:
-    """Return framework, native, fidelity, and Jaccard labels."""
+def smoke_details(row: dict[str, str], run: Path) -> tuple[str, str, str, str, str]:
+    """Return framework, native, fidelity, Jaccard, and fidelity-run labels."""
     overall = row.get("status", "NOT RUN")
     relative = row.get("evidence", "")
     path = run / relative if relative else None
     if not path or not path.is_file():
-        return overall, "—", "—", "—"
+        return overall, "—", "—", "—", ""
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return overall, "—", "—", "—"
+        return overall, "—", "—", "—", ""
     backends = payload.get("backends") or {}
     framework = backends.get("framework", {}).get("functional_validation", {}).get("status", overall)
     native = backends.get("native", {}).get("functional_validation", {}).get("status", "—")
     fidelity = payload.get("fidelity") or {}
     mean_jaccard = fidelity.get("mean_jaccard")
     jaccard = f"{mean_jaccard:.4f}" if isinstance(mean_jaccard, (int, float)) else "—"
-    return framework, native, fidelity.get("verdict", "—"), jaccard
+    return framework, native, fidelity.get("verdict", "—"), jaccard, str(payload.get("run_id", ""))
 
 
 def newest_experiment_run(root: Path, slug: str) -> Path | None:
@@ -186,19 +186,22 @@ def render(report: Path, run: Path) -> None:
             "",
             "Every selected adapter receives the same three public reports from `Tests/poc_tests`. PASS means the adapter processed all three reports through the common interface without a functional-contract violation. When paired fidelity is enabled, the native implementation receives the same inputs and the normalized document-level ATT&CK sets are compared. We recommend reviewing the tool predictions. Logs contain the framework's console output. Results links open the normalized `output` from the framework and the `raw` output from the containerized tool.",
             "",
-            "The expected mean Jaccard agreement is 1.0000 except for the LLM-based Büchel and TTP-LLM integrations, whose agreement is reported diagnostically.",
+            "**Native** means the original tool is run outside a container by following its released execution instructions, with the fixes required to make it workable and without TTP-WorkBench input or output normalization. The fidelity harness extracts the TTP predictions from the tool's original output for comparison.",
             "",
-            "| Adapter | Status | Framework | Native | Fidelity | Mean Jaccard | Summary | Log | Results |",
+            "**Framework** means the same workable tool is run within TTP-WorkBench through its adapter, which normalizes the input and output. The native and framework paths receive the same fixes needed to bring the tool to a workable state.",
+            "",
+            "Fidelity does not compare predictions with ground truth. Its purpose is to determine whether integration into TTP-WorkBench affects the tool's predictions. It is measured for each report using the **Jaccard agreement between the native and framework TTP prediction sets**: `|native ∩ framework| / |native ∪ framework|`. A mean Jaccard of 1.0000 means the two paths produced identical prediction sets for every report, so the framework did not change the tool's prediction performance on these inputs. The expected mean Jaccard agreement is 1.0000 except for the LLM-based Büchel and TTP-LLM integrations, whose agreement is reported diagnostically.",
+            "",
+            "| Adapter | Status | Framework | Native | Fidelity | Mean Jaccard | Fidelity report | Log | Results |",
             "|---|---|---|---|---|---:|---|---|---|",
         ]
         for tool in smoke_tools:
             row = by_phase_name.get(("smoke", tool), {})
-            framework_status, native_status, fidelity_status, mean_jaccard = smoke_details(row, run)
-            summary_relative = row.get("evidence", "")
+            framework_status, native_status, fidelity_status, mean_jaccard, fidelity_run = smoke_details(row, run)
             log_relative = row.get("log", "")
-            summary_path = run / summary_relative if summary_relative else None
             log_path = run / log_relative if log_relative else None
             results_root = run / "smoke/results" / tool.lower()
+            fidelity_report = results_root / "fidelity" / fidelity_run / "REPORT.md" if fidelity_run else None
             normalized_path = results_root / "output"
             raw_path = results_root / "raw"
             result_links = []
@@ -209,7 +212,7 @@ def render(report: Path, run: Path) -> None:
             lines.append(
                 f"| {tool} | {row.get('status', 'NOT RUN')} | "
                 f"{framework_status} | {native_status} | {fidelity_status} | {mean_jaccard} | "
-                f"{link('Summary', summary_path, report) if summary_path and summary_path.exists() else 'Not produced'} | "
+                f"{link('report', fidelity_report, report) if fidelity_report and fidelity_report.exists() else 'Not produced'} | "
                 f"{link('console output', log_path, report) if log_path and log_path.exists() else 'Not produced'} | "
                 f"{' / '.join(result_links) if result_links else 'Not produced'} |"
             )
@@ -220,7 +223,7 @@ def render(report: Path, run: Path) -> None:
             "",
             "## C2 — reproduction experiments",
             "",
-            ("The selected reproduction experiments are summarized below. We recommend beginning with the run-wide " + link("reproduction summary", repro_summary, report) + ", then opening each experiment's detailed report from its table row.") if repro_summary.exists() else "The selected reproduction experiments are summarized below. A run-wide reproduction summary was not produced.",
+            ("`PASS` in this table means that the reproduced experiments ran as expected. To verify that the resulting measurements are comparable to our submitted Table 6 and that our analysis follows from those results, drill down into the experiment reports. We recommend beginning with the run-wide " + link("reproduction summary", repro_summary, report) + ", then opening each experiment's detailed report from its table row.") if repro_summary.exists() else "`PASS` in this table means that the reproduced experiments ran as expected. To verify that the resulting measurements are comparable to our submitted Table 6 and that our analysis follows from those results, drill down into the experiment reports. A run-wide reproduction summary was not produced.",
             "",
             "| Experiment, in execution order | Status | Detailed evidence |",
             "|---|---|---|",
@@ -243,7 +246,9 @@ def render(report: Path, run: Path) -> None:
             "",
             f"Status: **{benchmark_status.get('status', 'NOT RUN')}**.",
             "",
-            "We recommend beginning with the comparison report. Confirm that the preserved archive files verify byte-for-byte, review the capacity-aware run conditions and direct-queue checks, and compare each paper figure with its fresh reconstruction. The reconstructed Figures 4–6 and 8 should support the paper's finding that the tools perform poorly on previously unseen reports even when evaluation is restricted to their capacities. The report explains any numerical differences. This phase reuses preserved predictions and performs no model inference; the command log is provided for execution details and troubleshooting.",
+            "Claim 3 reconstructs the complete benchmark analysis from preserved predictions rather than repeating roughly 18 days of inference across ten tools and three Orbinato configurations. Fresh tool execution is evaluated in Claims 1 and 2.",
+            "",
+            "A `PASS` means that all 38 preserved files passed archive verification, capacity-aware scoring and Figures 4–6 and 8 were reconstructed, and the direct-comparison queues contained 61 reports for TTPDrill versus rcATT and 27 reports for AttacKG versus RAF-AG. Begin with the comparison report and visually confirm that each paper reference and fresh result show similar results, including the same relative tool performance and overall patterns. The plotting style does not need to match exactly.",
             "",
             "- " + (link("Figures 4–6 and 8 comparison report", benchmark_report, report) if benchmark_report.exists() else "Benchmark report not produced."),
             "- " + (link("Benchmark command log", benchmark_log, report) if benchmark_log.exists() else "Benchmark log not produced."),

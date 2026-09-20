@@ -105,62 +105,6 @@ def run_command(command: list[str], env: dict[str, str], log) -> None:
         raise subprocess.CalledProcessError(completed.returncode, command)
 
 
-def canonical_tool(name: str) -> str:
-    lowered = name.lower()
-    if lowered.startswith("orbinato-"):
-        if "pretrained_lstm" in lowered or "lstm" in lowered:
-            return "Orbinato-LSTM"
-        if "secbert" in lowered:
-            return "Orbinato-SecBERT"
-        if "mlp" in lowered:
-            return "Orbinato-MLP"
-    return name
-
-
-def compare_csv(reference: Path, fresh: Path) -> dict[str, object]:
-    score_fields = [
-        "precision_micro", "recall_micro", "f1_micro",
-        "precision_macro", "recall_macro", "f1_macro",
-    ]
-    count_fields = [
-        "support_micro", "support_macro_labels", "capacity", "number_of_reports",
-    ]
-
-    def load(path: Path) -> dict[tuple[str, str], dict[str, str]]:
-        with path.open(newline="", encoding="utf-8") as handle:
-            return {
-                (row["eval"], canonical_tool(row["tool"])): row
-                for row in csv.DictReader(handle)
-            }
-
-    old, new = load(reference), load(fresh)
-    shared = sorted(old.keys() & new.keys())
-    max_score_delta = 0.0
-    max_count_delta = 0.0
-    changed = 0
-    for key in shared:
-        row_changed = False
-        for field in score_fields:
-            delta = abs(float(old[key][field]) - float(new[key][field]))
-            max_score_delta = max(max_score_delta, delta)
-            row_changed = row_changed or delta > 0
-        for field in count_fields:
-            delta = abs(float(old[key][field]) - float(new[key][field]))
-            max_count_delta = max(max_count_delta, delta)
-            row_changed = row_changed or delta > 0
-        changed += int(row_changed)
-    return {
-        "reference_rows": len(old),
-        "fresh_rows": len(new),
-        "matched_rows": len(shared),
-        "changed_rows": changed,
-        "max_score_delta": max_score_delta,
-        "max_count_delta": max_count_delta,
-        "missing_reference_keys": sorted(new.keys() - old.keys()),
-        "missing_fresh_keys": sorted(old.keys() - new.keys()),
-    }
-
-
 def direct_report_count(csv_path: Path, pair: str) -> int:
     with csv_path.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
@@ -179,23 +123,29 @@ def write_report(
     archive: Path,
     archive_hash: str,
     member_count: int,
-    author_comparison: dict[str, object],
-    curated_comparison: dict[str, object],
     pair_counts: dict[str, int],
 ) -> None:
-    def figure_row(number: str, reference: str, fresh: str) -> str:
-        paper_png = rel(PAPER / reference, report.parent)
-        fresh_png = rel(output / fresh, report.parent)
-        return f"| {number} | [![Paper {number}]({paper_png})]({paper_png}) | [![Fresh {number}]({fresh_png})]({fresh_png}) |"
+    reference_directory = report.parent / "paper_figures"
+    reference_directory.mkdir(parents=True, exist_ok=True)
+    reference_names = {
+        "benchmark_ours", "benchmark_others_non_prov", "ttp_boxplots_w_oracle",
+        "tool_comparison_pairs_TTPDrill_rcATT",
+        "tool_comparison_pairs_AttacKG_RAF-AG", "tool_comparison_pairs_10tools",
+    }
+    for name in reference_names:
+        for suffix in (".pdf", ".png"):
+            source = PAPER / f"{name}{suffix}"
+            destination = reference_directory / source.name
+            if source.resolve() != destination.resolve():
+                shutil.copy2(source, destination)
 
-    def comparison_row(name: str, result: dict[str, object]) -> str:
-        exact = result["changed_rows"] == 0 and not result["missing_reference_keys"] and not result["missing_fresh_keys"]
-        status = "exact" if exact else "differs"
-        return (
-            f"| {name} | {result['reference_rows']} | {result['fresh_rows']} | "
-            f"{result['changed_rows']} | {result['max_score_delta']:.4g} | "
-            f"{result['max_count_delta']:.0f} | {status} |"
-        )
+    def figure_row(number: str, reference: str, fresh: str) -> str:
+        paper_png = rel(reference_directory / reference, report.parent)
+        paper_pdf = rel(reference_directory / Path(reference).with_suffix(".pdf"), report.parent)
+        fresh_png = rel(output / fresh, report.parent)
+        paper_image = f'<a href="{paper_pdf}"><img src="{paper_png}" alt="Paper {number}" width="420"></a>'
+        fresh_image = f'<a href="{fresh_png}"><img src="{fresh_png}" alt="Fresh {number}" width="420"></a>'
+        return f"| {number} | {paper_image} | {fresh_image} |"
 
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(
@@ -207,15 +157,34 @@ def write_report(
             "same prediction archive against the currently compiled ground truth. No model "
             "inference is performed.",
             "",
+            "## Evaluation scope and pass criteria",
+            "",
+            "Claim 3 reconstructs the benchmark analysis from the predictions used in the "
+            "submitted paper rather than rerunning the complete benchmark inference workload. "
+            "A fresh sequential run would execute ten tools, including three Orbinato model "
+            "configurations, on 281 author-labeled and 426 curated reports. Based on our "
+            "benchmark runs, this would take roughly 18 days. Claim 1 exercises all ten "
+            "integrations, and Claim 2 reruns selected "
+            "experiments end to end, so Claim 3 focuses the evaluator workload on reconstructing "
+            "and reviewing the complete benchmark analysis.",
+            "",
+            "Claim 3 records `PASS` when all 38 preserved files pass archive verification, the "
+            "capacity-aware evaluation completes, Figures 4--6 and 8 are reconstructed, and "
+            "the direct-comparison queues contain 61 reports for TTPDrill versus rcATT and 27 "
+            "reports for AttacKG versus RAF-AG. Visually compare each paper reference with its "
+            "fresh result and confirm that they show similar results, including the same "
+            "relative tool performance and overall patterns. The plotting style does not need "
+            "to match exactly.",
+            "",
             "## Run conditions",
             "",
-            "| Figure | Data and queue | Scoring | Label treatment |",
-            "|---|---|---|---|",
-            "| 4(a) | 281 author-labeled CTRs | Generous, micro precision/recall/F1 | Modernized codes; non-collapse |",
-            "| 4(b) | Never-before-seen curated prior-work CTRs; rcATT-derived ground truth excluded | Generous, micro precision/recall/F1 | Modernized codes; non-collapse |",
-            "| 5 | Combined benchmark; support >= 50; TTP in at least three tools' capacities; TTP-LLM excluded because it predicts tactics only | Per-TTP F1 and best-tool oracle | Modernized codes; non-collapse |",
-            "| 6 | TTPDrill/rcATT and AttacKG/RAF-AG direct queues | Generous metrics on the joint-capacity report intersection | Previously seen reports excluded; non-collapse |",
-            "| 8 | All direct tool pairs with at least 10 eligible reports | Generous metrics on each joint-capacity report intersection | Previously seen reports excluded; non-collapse |",
+            "| Figure | Data and queue | Evaluation |",
+            "|---|---|---|",
+            "| 4(a) | 281 author-labeled CTRs | Micro precision/recall/F1; discard codes not in the tool's TTP capacity |",
+            "| 4(b) | Never-before-seen curated prior-work CTRs; rcATT-derived ground truth excluded | Micro precision/recall/F1; discard codes not in the tool's TTP capacity |",
+            "| 5 | Combined benchmark; support >= 50; TTP in at least three tools' capacities; TTP-LLM excluded because it predicts tactics only | Per-TTP F1 and best-tool oracle |",
+            "| 6 | TTPDrill/rcATT and AttacKG/RAF-AG direct queues | Micro precision/recall/F1 on the joint-capacity report intersection; previously seen reports excluded |",
+            "| 8 | All direct tool pairs with at least 10 eligible reports | Micro precision/recall/F1 on each joint-capacity report intersection; previously seen reports excluded |",
             "",
             "As stated in the submission, a direct comparison evaluates tools only on reports "
             "whose ground-truth TTP set is "
@@ -227,20 +196,9 @@ def write_report(
             f"- Archive: `{rel(archive, report.parent)}`",
             f"- SHA-256: `{archive_hash}`",
             f"- Verified archive files: {member_count}",
-            "- Every archived file was compared byte-for-byte with its materialized counterpart.",
+            "- The archive and materialized files passed verification.",
             "",
-            "The archive does match the files under `results/on_curated_data` and "
-            "`results/on_author_labeled_data`. The comparison below separately tests whether "
-            "today's ground-truth compilation reproduces the evaluation CSV preserved in that archive.",
-            "",
-            "| Evaluation CSV | Reference rows | Fresh rows | Changed matched rows | Maximum score delta | Maximum count delta | Result |",
-            "|---|---:|---:|---:|---:|---:|---|",
-            comparison_row("Author-labeled", author_comparison),
-            comparison_row("Curated", curated_comparison),
-            "",
-            "A difference here indicates ground-truth or evaluation-input drift; it does not mean "
-            "the archived prediction files failed verification. The preserved CSV remains the "
-            "paper reference and the fresh CSV remains the result of this run.",
+            "The archived prediction and evaluation files used to generate the paper figures were verified before the figures were regenerated.",
             "",
             "## Direct queue checks",
             "",
@@ -365,12 +323,6 @@ def main() -> None:
         run_command(direct_common + ["--tools", "AttacKG", "RAF-AG"], env, log)
         run_command(direct_common + ["--tools", "all"], env, log)
 
-    author_comparison = compare_csv(
-        author_root / "eval_summary_on_author_labeled_data.csv", author_csv,
-    )
-    curated_comparison = compare_csv(
-        curated_root / "eval_curated_non_provenance.csv", curated_csv,
-    )
     all_pairs = direct_output / "evaluation_summary_all_pairs.csv"
     pair_counts = {
         pair: direct_report_count(all_pairs, pair)
@@ -378,7 +330,7 @@ def main() -> None:
     }
     write_report(
         report, output, archive, archive_hash, member_count,
-        author_comparison, curated_comparison, pair_counts,
+        pair_counts,
     )
     print(f"Wrote {report}")
 

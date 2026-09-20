@@ -1,7 +1,7 @@
 # maps the adapter names to their respective module paths, container names, and workspace paths
 # NOTE TO DO: apply these in adapter class definitions and Dockerfiles; search for and clean up other hardcoded paths
 
-attack_version = "18.1" # set to None to enable update
+attack_version = "19.2" # set to None to enable update
 
 # map of adapter names to their module paths
 adapter_module_map = {

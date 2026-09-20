@@ -315,6 +315,12 @@ FRAMEWORK_PYTHON=$PROJECT/.venv/bin/python
 "$FRAMEWORK_PYTHON" -m pip install -e "$PROJECT" -r "$PROJECT/requirements.txt"
 export FRAMEWORK_PYTHON
 
+echo "Staging pinned MITRE ATT&CK STIX snapshots"
+(
+    cd "$PROJECT"
+    "$FRAMEWORK_PYTHON" -m Framework.utils.attack_lookup --ensure
+)
+
 echo "[2/11] Building selected tool containers with $ENGINE"
 case "$SELECTION" in
     core) CONTAINER_ARGS=(--attackg --ttpdrill --ladder --ttp-llm);;

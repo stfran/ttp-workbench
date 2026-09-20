@@ -34,7 +34,7 @@ MITRE license accompanies the ATT&CK and CAPEC material in that payload.
 
 ### MITRE ATT&CK
 
-TTP-WorkBench includes MITRE ATT&CK STIX JSON files under `Framework/utils/attack_stix/` and uses them to validate ATT&CK identifiers, retrieve TTP metadata, and handle updated/deprecated technique codes. The included snapshot is ATT&CK version 19.2 and is distributed under MITRE's license reproduced in `Framework/utils/attack_stix/LICENSE.txt`. Copies of those files must retain MITRE's copyright designation and license.
+The TTP-WorkBench installer downloads and verifies MITRE ATT&CK STIX JSON files under `Framework/utils/attack_stix/` and uses them to validate ATT&CK identifiers, retrieve TTP metadata, and handle updated/deprecated technique codes. The pinned snapshot is ATT&CK version 19.2 and is distributed under MITRE's license reproduced in `Framework/utils/attack_stix/LICENSE.txt`. Copies of those files must retain MITRE's copyright designation and license.
 
 ### Author-labeled cyber threat reports
 

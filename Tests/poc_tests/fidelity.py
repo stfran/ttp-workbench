@@ -199,6 +199,12 @@ def write_fidelity_outputs(directory: Path, comparison: dict[str, Any]) -> None:
         f"Exact reports: {comparison['exact_reports']}/{comparison['expected_reports']}  ",
         f"Mean Jaccard agreement: {comparison['mean_jaccard']:.4f}",
         "",
+        "**Native** is the original tool run outside a container by following its released execution instructions, with the fixes required to make it workable and without TTP-WorkBench input or output normalization. The fidelity harness extracts TTP predictions from the tool's original output.",
+        "",
+        "**Framework** is the same workable tool run within TTP-WorkBench through its adapter, which normalizes the input and output. The native and framework paths receive the same fixes needed to bring the tool to a workable state.",
+        "",
+        "Fidelity does not compare predictions with ground truth. Its purpose is to determine whether integration into TTP-WorkBench affects the tool's predictions. Jaccard agreement measures this prediction-set fidelity for each report as `|native ∩ framework| / |native ∪ framework|`. A value of 1.0000 means the two paths produced identical TTP prediction sets, so the framework did not change the tool's prediction performance on that input.",
+        "",
     ]
     if comparison["contract_failures"]:
         lines += ["## Contract failures", ""]

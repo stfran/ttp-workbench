@@ -362,6 +362,14 @@ run_reproduction_phase() {
             run_logged_append "$RUN_DIR/$repro_log.resume" "${repro_command[@]}" || repro_code=$?
         done
         mv "$RUN_DIR/$repro_log.resume" "$RUN_DIR/$repro_log"
+        if $repro_executed; then
+            repro_command=(
+                "$PYTHON_BIN" "$PROJECT/Tests/Reproductions/helpers/build_reports.py"
+                --root "$RUN_DIR/reproductions" --summary-only --selection "$SELECTION"
+            )
+            printf '%q ' "${repro_command[@]}" >> "$LOG"; printf '\n' >> "$LOG"
+            run_logged_append "$RUN_DIR/$repro_log" "${repro_command[@]}" || repro_code=$?
+        fi
     fi
     if [[ "$repro_code" == 0 ]]; then
         if [[ -n "$RESUME_DIR" && "$repro_executed" == false && "$previous_repro_status" == PASS ]]; then

@@ -520,7 +520,7 @@ def main():
     # Use the same sizing heuristic you liked for single plots, scaled to a grid.
     max_tools_in_any_subplot = max(len(job["plot_tools"]) for job in pair_jobs)
     per_subplot_w = max(3.0, max_tools_in_any_subplot - 1)
-    per_subplot_h = 2.5
+    per_subplot_h = 3.2 if len(pair_jobs) == 1 else 2.8
 
     figsize = (per_subplot_w * ncols, per_subplot_h * nrows)
 
@@ -550,7 +550,7 @@ def main():
             ax.bar(x + offsets[m_idx], vals, width, label=metric_labels[m_idx], alpha=0.85)
 
         ax.set_xticks(x)
-        ax.set_xticklabels(plot_tools_names, fontsize=12)
+        ax.set_xticklabels(plot_tools_names, fontsize=12, rotation=45, ha="right")
         ax.set_ylim(0, 1)
         ax.set_title(f"Comparison on {shared_count} reports", fontsize=14)
 
@@ -572,7 +572,7 @@ def main():
     tools_slug = "_".join(selected_tools) if len(selected_tools) <= 4 else f"{len(selected_tools)}tools"
     fig_path = os.path.join(args.output_dir, f"tool_comparison_pairs_{tools_slug}.pdf")
     plt.savefig(fig_path, dpi=300, bbox_inches="tight")
-    plt.savefig(str(Path(fig_path).with_suffix(".png")), dpi=180, bbox_inches="tight")
+    plt.savefig(str(Path(fig_path).with_suffix(".png")), dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
